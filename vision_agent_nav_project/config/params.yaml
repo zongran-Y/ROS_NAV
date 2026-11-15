@@ -1,0 +1,67 @@
+perception_node:
+  ros__parameters:
+    use_sim_time: true
+    image_topic: /camera/image_raw
+    depth_image_topic: /camera/depth/image_raw
+    camera_info_topic: /camera/camera_info
+    use_depth_distance: true
+    # Gazebo depth cameras publish 32FC1 values in metres. For a RealSense
+    # 16UC1 stream use 0.001 instead.
+    depth_scale: 1.0
+    depth_max_age_s: 0.25
+    depth_max_m: 10.0
+    # Defaults for TurtleBot3/Gazebo 640x480 camera. If /camera/camera_info is
+    # available, runtime CameraInfo overrides these values.
+    camera_fx: 554.0
+    camera_fy: 554.0
+    camera_cx: 320.0
+    camera_cy: 240.0
+    camera_frame: camera_optical_frame
+    model: yolov8n.pt
+    confidence: 0.25
+    focal_length_px: 554.0
+    default_object_height_m: 1.7
+    # CPU-only simulation profile. Keep the source camera at 320x240 and
+    # preserve the detector size needed for partial-person targets.
+    inference_fps: 3.0
+    inference_image_size: 640
+    target_classes:
+      - person
+      - chair
+      - bottle
+      - cup
+      - dining table
+
+scene_state_node:
+  ros__parameters:
+    target_class: person
+    center_tolerance: 0.25
+    near_area_ratio: 0.18
+    medium_area_ratio: 0.08
+    # Multi-target ranking weights. The selected target balances YOLO
+    # confidence, image centering, RGB-D depth reliability and target scale.
+    rank_confidence_weight: 0.35
+    rank_center_weight: 0.30
+    rank_depth_weight: 0.20
+    rank_area_weight: 0.10
+    rank_class_match_weight: 0.05
+    rank_depth_max_m: 6.0
+    rank_max_area_ratio: 0.30
+
+target_planner_node:
+  ros__parameters:
+    center_tolerance: 0.25
+    near_area_ratio: 0.18
+    approach_distance_m: 1.0
+    target_reached_distance_m: 0.8
+    target_far_distance_m: 1.5
+
+agent_node:
+  ros__parameters:
+    max_subgoals: 3
+    reach_confirmation_frames: 3
+
+metrics_node:
+  ros__parameters:
+    window_size: 100
+    log_path: logs/metrics.jsonl

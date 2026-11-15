@@ -1,0 +1,21 @@
+FROM vision-agent-nav-sim:xvfb
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TURTLEBOT3_MODEL=waffle_pi
+ENV GAZEBO_MODEL_PATH=/root/.gazebo/models:/opt/ros/humble/share/turtlebot3_gazebo/models
+ENV QT_QPA_PLATFORM=xcb
+ENV LIBGL_ALWAYS_SOFTWARE=1
+
+RUN mkdir -p /root/.gazebo/models && \
+    cp -a /opt/ros/humble/share/turtlebot3_gazebo/models/turtlebot3_world /root/.gazebo/models/
+COPY models/person_standing_fuel/ /root/.gazebo/models/person_standing/
+
+WORKDIR /opt/ros_ws/src/vision_agent_nav
+COPY . /opt/ros_ws/src/vision_agent_nav
+WORKDIR /opt/ros_ws
+RUN bash -lc 'source /opt/ros/humble/setup.bash && colcon build --symlink-install --packages-select vision_agent_nav'
+
+# A previous container restart can leave an X11 socket and lock behind even
+# after Xvfb has died. Check the server itself, remove stale files, and fail
+# loudly if a usable display cannot be started; Gazebo RGB-D sensors require it.
+ENTRYPOINT ["bash", "-lc", "source /opt/ros/humble/setup.bash && source /opt/ros_ws/install/setup.bash; rm -f /tmp/.X99-lock /tmp/.X11-unix/X99; Xvfb :99 -screen 0 1280x1024x24 +extension GLX -nolisten tcp >/tmp/xvfb.log 2>&1 & xvfb_pid=$!; export DISPLAY=:99; ready=0; for i in $(seq 1 30); do if kill -0 $xvfb_pid 2>/dev/null && [ -S /tmp/.X11-unix/X99 ]; then ready=1; break; fi; sleep 1; done; if [ $ready -ne 1 ]; then cat /tmp/xvfb.log; exit 1; fi; exec ros2 launch vision_agent_nav vision_agent_bringup.launch.py gui:=false enable_perception:=false"]

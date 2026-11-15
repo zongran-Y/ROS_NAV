@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>vision_agent_nav</name>
+  <version>0.1.0</version>
+  <description>ROS2 visual target search and lightweight Agent navigation for TurtleBot3.</description>
+  <maintainer email="maintainers@example.org">Vision Agent Navigation contributors</maintainer>
+  <license>MIT</license>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>builtin_interfaces</depend>
+  <depend>nav_msgs</depend>
+  <depend>nav2_msgs</depend>
+  <depend>rosgraph_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>cv_bridge</depend>
+  <depend>gazebo_ros</depend>
+  <depend>tf2_ros</depend>
+
+  <exec_depend>python3-opencv</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

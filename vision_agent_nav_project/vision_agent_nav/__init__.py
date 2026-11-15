@@ -1,0 +1,2 @@
+"""Vision Agent navigation package."""
+
